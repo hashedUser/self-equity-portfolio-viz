@@ -1,6 +1,7 @@
 import yfinance as yf
 import os
 from datetime import datetime, timedelta
+import pandas as pd
 
 # List of stock symbols
 symbols = [
@@ -9,38 +10,54 @@ symbols = [
     'RCF.NS', 'RELIANCE.NS', 'STARCEMENT.NS', 'TATAPOWER.NS'
 ]
 
-# Output directory for historical data
-output_dir = "data"
-os.makedirs(output_dir, exist_ok=True)
+def create_output_dir(path: str) -> None:
+    os.makedirs(path, exist_ok=True)
 
-# Define date range: past 3 months
-end_date = datetime.today().date()
-start_date = end_date - timedelta(days=90)
+def get_date_range(days: int = 90):
+    end_date = datetime.today().date()
+    start_date = end_date - timedelta(days=days)
+    return start_date, end_date
 
-# Loop over each symbol
-for symbol in symbols:
+def download_historical_data(symbol: str, start_date, end_date) -> pd.DataFrame:
+    return yf.download(symbol, start=start_date, end=end_date, progress=False)
+
+def print_symbol_info(symbol: str):
+    stock = yf.Ticker(symbol)
+    info = stock.info
+    print(f"  Name   : {info.get('shortName', 'N/A')}")
+    print(f"  Market : {info.get('market', 'N/A')}")
+    print(f"  Sector : {info.get('sector', 'N/A')}")
+
+def save_data_to_csv(df: pd.DataFrame, symbol: str, output_dir: str):
+    filename = f"{symbol.replace('.', '_')}_history.csv"
+    file_path = os.path.join(output_dir, filename)
+    df.to_csv(file_path)
+    print(f"  ✔ Saved historical data to {file_path}")
+
+def process_symbol(symbol: str, output_dir: str, start_date, end_date):
     print(f"Processing {symbol}...")
-
     try:
-        # 1. Download historical OHLCV data
-        df = yf.download(symbol, start=start_date, end=end_date, progress=False)
+        df = download_historical_data(symbol, start_date, end_date)
 
         if not df.empty:
-            file_path = os.path.join(output_dir, f"{symbol.replace('.', '_')}_history.csv")
-            df.to_csv(file_path)
-            print(f"  ✔ Saved historical data to {file_path}")
+            save_data_to_csv(df, symbol, output_dir)
         else:
             print(f"  ✖ No historical data for {symbol}")
 
-        # 2. Print metadata (do NOT save to file)
-        stock = yf.Ticker(symbol)
-        info = stock.info
-
-        print(f"  Name   : {info.get('shortName', 'N/A')}")
-        print(f"  Market : {info.get('market', 'N/A')}")
-        print(f"  Sector : {info.get('sector', 'N/A')}")
+        print_symbol_info(symbol)
 
     except Exception as e:
         print(f"  ⚠ Error processing {symbol}: {e}")
 
     print("-" * 40)
+
+def main():
+    output_dir = "data"
+    create_output_dir(output_dir)
+    start_date, end_date = get_date_range(90)
+
+    for symbol in symbols:
+        process_symbol(symbol, output_dir, start_date, end_date)
+
+if __name__ == "__main__":
+    main()
