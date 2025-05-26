@@ -9,6 +9,7 @@ dependencies = [
     "dash>=3.0.4",
     "dash-core-components>=2.0.0",
     "dash-html-components>=2.0.0",
+    "dotenv>=0.9.9",
     "finnhub-python>=2.4.23",
     "ipykernel>=6.29.5",
     "matplotlib>=3.10.3",
