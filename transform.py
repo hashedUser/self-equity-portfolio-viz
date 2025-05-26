@@ -11,20 +11,14 @@ def extract_symbol_from_filename(filename):
     return filename.replace("NS_history.csv", "").replace("_", "")
 
 def transform_csv(file_path, symbol):
-    # Read multi-row header CSV
     df = pd.read_csv(file_path, header=[0, 1])
-
-    # Flatten column names (use top-level or fallback to 'Date')
     df.columns = [col[0] if col[0] != "Price" else "Date" for col in df.columns]
-
-    # Drop the top two rows (Ticker/Date & symbol row)
     df = df.drop(index=[0, 1]).reset_index(drop=True)
 
-    # Add extracted symbol to a new column
     df["Symbol"] = symbol
 
-    # Convert date and numeric fields
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+
     for col in ["Open", "High", "Low", "Close", "Volume"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 

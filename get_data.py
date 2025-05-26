@@ -1,9 +1,9 @@
-import yfinance as yf
 import os
-from datetime import datetime, timedelta
 import pandas as pd
+import yfinance as yf
+from datetime import datetime, timedelta
 
-# List of stock symbols
+# List of symbols
 symbols = [
     'ACC.NS', 'BANKBARODA.NS', 'FEDERALBNK.NS', 'IRFC.NS',
     'LTTS.NS', 'LT.NS', 'NTPCGREEN.NS', 'NTPC.NS',
