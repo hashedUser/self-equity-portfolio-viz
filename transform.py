@@ -1,10 +1,6 @@
 import os
 import warnings
 import pandas as pd
-import datetime as dt
-from dotenv import load_dotenv
-
-load_dotenv()
 
 warnings.filterwarnings('ignore')
 
